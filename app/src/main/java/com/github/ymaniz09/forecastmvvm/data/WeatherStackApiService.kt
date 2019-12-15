@@ -1,5 +1,6 @@
 package com.github.ymaniz09.forecastmvvm.data
 
+import com.github.ymaniz09.forecastmvvm.data.db.network.ConnectivityInterceptor
 import com.github.ymaniz09.forecastmvvm.data.db.network.response.CurrentWeatherResponse
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -23,7 +24,9 @@ interface WeatherStackApiService {
     ): CurrentWeatherResponse
 
     companion object {
-        operator fun invoke(): WeatherStackApiService {
+        operator fun invoke(
+            connectivityInterceptor: ConnectivityInterceptor
+        ): WeatherStackApiService {
             val requestInterceptor = Interceptor { chain ->
 
                 val url = chain.request()
@@ -38,7 +41,6 @@ interface WeatherStackApiService {
                     .build()
 
                 return@Interceptor chain.proceed(request)
-
             }
 
             val logging = HttpLoggingInterceptor()
@@ -47,6 +49,7 @@ interface WeatherStackApiService {
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(requestInterceptor)
                 .addInterceptor(logging)
+                .addInterceptor(connectivityInterceptor)
                 .build()
 
             return Retrofit.Builder()
