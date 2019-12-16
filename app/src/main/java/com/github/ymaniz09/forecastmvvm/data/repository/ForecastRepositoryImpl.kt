@@ -25,6 +25,7 @@ class ForecastRepositoryImpl(
     override suspend fun getCurrentWeather(metric: Boolean): LiveData<CurrentWeatherEntry> {
         return withContext(Dispatchers.IO) {
 
+            initWeatherData()
             return@withContext currentWeatherDao.getWeatherEntry()
         }
     }
@@ -35,7 +36,7 @@ class ForecastRepositoryImpl(
         }
     }
 
-    private suspend fun initWeatherDAta() {
+    private suspend fun initWeatherData() {
         if (isFetchCurrentNeeded(ZonedDateTime.now().minusHours(1))) {
             fetchCurrentWeather()
         }
